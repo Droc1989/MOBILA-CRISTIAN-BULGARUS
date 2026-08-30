@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Probează mobila în camera ta | Mobilă Cristian Bulgăruș</title>
+  <meta name="description" content="Încarcă o fotografie a camerei tale și poziționează virtual canapele, paturi sau dulapuri direct în imagine.">
+  <meta name="theme-color" content="#2f211a"><link rel="canonical" href="https://www.mobilacristian.onl/probeaza-mobila.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Karla:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/site.css">
+</head>
+<body>
+  <div data-site-header></div>
+  <main>
+    <header class="planner-hero"><div class="container"><p class="eyebrow">Simulator gratuit</p><h1>Probează mobila în camera ta</h1><p class="lead">Fotografiază camera, alege o piesă și așaz-o unde dorești. Poți muta, redimensiona și roti fiecare piesă direct cu degetul.</p></div></header>
+
+    <section class="planner-section"><div class="container">
+      <div class="planner-steps" aria-label="Pașii simulatorului"><span><strong>1</strong> Încarcă fotografia</span><span><strong>2</strong> Alege mobila</span><span><strong>3</strong> Potrivește și descarcă</span></div>
+
+      <div class="planner-layout">
+        <section class="planner-workspace" aria-labelledby="workspace-title">
+          <div class="planner-toolbar"><div><p class="eyebrow">Camera ta</p><h2 id="workspace-title">Spațiul de lucru</h2></div><label class="btn btn-gold upload-button" for="room-photo">Încarcă o fotografie<input id="room-photo" type="file" accept="image/*" capture="environment"></label></div>
+          <p class="planner-help" id="planner-help">Pe telefon se va deschide camera. Pe calculator poți selecta o fotografie salvată.</p>
+          <div class="canvas-frame" data-empty-label="Încarcă o fotografie a camerei pentru a începe">
+            <canvas id="room-canvas" width="1200" height="750" aria-label="Fotografia camerei și piesele de mobilier adăugate"></canvas>
+          </div>
+          <p class="planner-status" id="planner-status" role="status" aria-live="polite">Așteptăm fotografia camerei.</p>
+        </section>
+
+        <aside class="furniture-panel" aria-labelledby="furniture-title">
+          <p class="eyebrow">Mobilier disponibil</p><h2 id="furniture-title">Alege o piesă</h2><p>Apasă pe o miniatură pentru a adăuga piesa în centrul fotografiei.</p>
+          <div class="furniture-list">
+            <button class="furniture-thumb" type="button" data-furniture="assets/furniture/canapea-bej.png" data-name="Canapea bej"><img src="assets/furniture/canapea-bej.png" alt="Canapea bej" loading="eager"><span>Canapea bej</span></button>
+            <button class="furniture-thumb" type="button" data-furniture="assets/furniture/pat-verde.png" data-name="Pat tapițat verde"><img src="assets/furniture/pat-verde.png" alt="Pat tapițat verde" loading="eager"><span>Pat tapițat</span></button>
+            <button class="furniture-thumb" type="button" data-furniture="assets/furniture/dulap-stejar.png" data-name="Dulap stejar"><img src="assets/furniture/dulap-stejar.png" alt="Dulap stejar" loading="eager"><span>Dulap stejar</span></button>
+          </div>
+          <div class="planner-legend"><p><span class="legend-box"></span> Trage piesa pentru a o muta</p><p><span class="legend-resize"></span> Mânerul din colț redimensionează</p><p><span class="legend-rotate"></span> Mânerul de sus rotește</p></div>
+          <div class="planner-actions"><button class="btn btn-light" id="delete-furniture" type="button" disabled>Șterge piesa selectată</button><button class="btn btn-dark" id="download-room" type="button" disabled>Descarcă imaginea</button></div>
+          <p class="privacy-note">Fotografia este prelucrată numai în browserul tău și nu este trimisă pe server.</p>
+        </aside>
+      </div>
+    </div></section>
+  </main>
+  <div data-site-footer></div>
+  <script src="assets/site.js"></script><script src="assets/room-planner.js"></script>
+</body>
+</html>
