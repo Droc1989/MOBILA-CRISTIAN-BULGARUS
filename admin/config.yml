@@ -1,0 +1,59 @@
+backend:
+  name: git-gateway
+  branch: main
+
+locale: ro
+site_url: https://www.mobilacristian.onl
+display_url: https://www.mobilacristian.onl
+logo_url: https://www.mobilacristian.onl/assets/brand/logo-mobila-cristian.png
+media_folder: assets/uploads
+public_folder: /assets/uploads
+publish_mode: simple
+
+collections:
+  - name: catalog
+    label: Catalog mobilier
+    files:
+      - name: products
+        label: Produse și categorii
+        file: data/catalog.json
+        format: json
+        fields:
+          - label: Categorii
+            name: categories
+            widget: list
+            summary: "{{fields.name}}"
+            fields:
+              - {label: Identificator, name: slug, widget: string, hint: "Nu modifica decât dacă se schimbă și pagina categoriei."}
+              - {label: Numele categoriei, name: name, widget: string}
+              - {label: Descrierea categoriei, name: description, widget: text}
+              - {label: Imaginea categoriei, name: image, widget: image}
+          - label: Produse
+            name: products
+            widget: list
+            summary: "{{fields.name}}"
+            fields:
+              - {label: Identificator produs, name: id, widget: string, hint: "Folosește litere mici și cratimă; trebuie să fie unic."}
+              - {label: Numele produsului, name: name, widget: string}
+              - label: Categorie
+                name: category
+                widget: select
+                options:
+                  - {label: Dormitoare și paturi, value: dormitoare}
+                  - {label: Dulapuri, value: dulapuri}
+                  - {label: Comode și mese de toaletă, value: comode}
+                  - {label: Mese și scaune, value: mese}
+                  - {label: Mobilier living, value: living}
+                  - {label: Canapele și fotolii, value: canapele}
+                  - {label: Alte produse, value: altele}
+              - {label: Fotografia principală, name: image, widget: image}
+              - label: Fotografii suplimentare
+                name: gallery
+                widget: list
+                required: false
+                field: {label: Fotografie, name: image, widget: image}
+              - {label: Descriere scurtă, name: shortDescription, widget: text}
+              - {label: Descriere completă, name: description, widget: text}
+              - {label: Dimensiuni, name: dimensions, widget: string}
+              - {label: Materiale, name: materials, widget: string}
+              - {label: Produs vizibil pe site, name: available, widget: boolean, default: true}

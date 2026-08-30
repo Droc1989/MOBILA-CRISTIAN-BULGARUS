@@ -4,10 +4,10 @@ Site static responsive pentru prezentarea și solicitarea rapidă a mobilierului
 
 ## Funcții principale
 
-- navigare pe ramuri: dormitoare și paturi, dulapuri, comode, mese și scaune, living, canapele și alte produse;
-- galerie cu fotografii reale, filtrare pe categorii și vizualizare mărită;
+- pagină separată pentru fiecare ramură: dormitoare și paturi, dulapuri, comode, mese și scaune, living, canapele și alte produse;
+- pagină de detalii pentru fiecare produs, cu fotografii, descriere, dimensiuni și materiale;
 - cerere de detalii pentru fiecare model, trimisă rapid prin WhatsApp;
-- formular general de contact prin Netlify Forms;
+- panou de administrare la `/admin/`, bazat pe Decap CMS, Netlify Identity și Git Gateway;
 - formular „Ai o dorință de mobilă?”, inclusiv încărcarea unei fotografii de pe telefon;
 - bară de contact fixă pe telefon: apel, WhatsApp și cerere de ofertă;
 - mesajul „Montaj gratuit” evidențiat în zonele principale;
@@ -16,7 +16,12 @@ Site static responsive pentru prezentarea și solicitarea rapidă a mobilierului
 ## Structură
 
 ```text
-index.html                         pagina principală, stiluri și interacțiuni
+index.html                         pagina principală simplificată
+categorii/                         paginile celor șapte categorii
+produs.html                        pagina dinamică de detalii a produsului
+data/catalog.json                  catalogul central editabil
+admin/                             loginul și panoul administratorului
+assets/site.css / assets/site.js   designul și funcționalitatea comună
 assets/brand/                      logo-ul oficial
 assets/facebook/                   fotografii recente preluate din pagina afacerii
 assets/images/                     fotografiile catalogului și elementele legale
@@ -28,7 +33,18 @@ robots.txt / sitemap.xml           configurarea indexării
 
 ## Formulare
 
-Formularele `solicitare-mobilier` și `dorinta-mobilier` folosesc Netlify Forms. Pentru notificări prin e-mail, acestea se configurează în Netlify la **Forms → Form notifications**.
+Formularul `dorinta-mobilier` folosește Netlify Forms. Pentru notificări prin e-mail, acestea se configurează în Netlify la **Forms → Form notifications**.
+
+## Administrare
+
+Administratorul deschide `https://www.mobilacristian.onl/admin/`, se autentifică și poate:
+
+- adăuga, ascunde sau modifica produse;
+- încărca fotografia principală și imagini suplimentare;
+- modifica descrierile, dimensiunile și materialele;
+- schimba imaginile și descrierile categoriilor.
+
+Accesul se păstrează pe bază de invitație. Modificările sunt salvate în `data/catalog.json` și în `assets/uploads/`.
 
 ## Contact folosit pe site
 
