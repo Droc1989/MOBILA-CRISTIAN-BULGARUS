@@ -7,6 +7,7 @@ Site static responsive pentru prezentarea și solicitarea rapidă a mobilierului
 - pagină separată pentru fiecare ramură: dormitoare și paturi, dulapuri, comode, mese și scaune, living, canapele și alte produse;
 - pagină de detalii pentru fiecare produs, cu fotografii, descriere, dimensiuni și materiale;
 - pagină „Probează mobila” cu fotografie de cameră și poziționare, redimensionare și rotire direct pe canvas;
+- pagină „Montaj la clienți” și secțiune „Părerea clienților” pe pagina principală;
 - cerere de detalii pentru fiecare model, trimisă rapid prin WhatsApp;
 - panou de administrare propriu la `/admin/`, autentificat prin Netlify Identity și conectat la repository prin Git Gateway;
 - compresie automată în browser pentru fotografiile încărcate din panoul de administrare;
@@ -24,6 +25,7 @@ categorii/                         paginile celor șapte categorii
 produs.html                        compatibilitate pentru linkurile vechi de produs
 produse/                           paginile statice generate pentru fiecare produs
 probeaza-mobila.html               instrumentul de probare a mobilierului în cameră
+montaj-clienti.html                fotografii și păreri publicate cu acordul clienților
 data/catalog.json                  catalogul central editabil
 data/site.json                     conținutul paginii principale și noutățile
 admin/index.html + admin/app.js    interfața proprie de administrare
@@ -54,6 +56,7 @@ Administratorul deschide `https://www.mobilacristian.onl/admin/`, se autentific�
 - modifica descrierile, dimensiunile și materialele;
 - schimba imaginea și textele principale ale site-ului;
 - publica, modifica sau ascunde noutăți.
+- publica lucrări montate cu fotografie, client, localitate și părere, după confirmarea acordului de publicare.
 
 Panoul nu folosește Decap CMS. Este o interfață JavaScript proprie: Netlify Identity autentifică administratorul, iar Git Gateway permite citirea și scrierea fișierelor din repository. Accesul se păstrează pe bază de invitație.
 

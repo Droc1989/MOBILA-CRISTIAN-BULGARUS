@@ -32,6 +32,7 @@
     <nav class="tabs" aria-label="Secțiuni administrare">
       <button class="tab active" data-tab="products" type="button">Mobilă</button>
       <button class="tab" data-tab="news" type="button">Noutăți</button>
+      <button class="tab" data-tab="testimonials" type="button">Clienți mulțumiți</button>
       <button class="tab" data-tab="page" type="button">Pagina principală</button>
     </nav>
 
@@ -49,6 +50,11 @@
       <section class="panel" data-panel="news">
         <div class="page-heading"><div><p class="eyebrow">Mesaje publice</p><h1>Noutăți din magazin</h1><p>Publică rapid mesaje precum „Am primit mobilă nouă”.</p></div><button class="button primary" type="button" data-add-news>＋ Adaugă noutate</button></div>
         <div class="news-list" data-news-list></div>
+      </section>
+
+      <section class="panel" data-panel="testimonials">
+        <div class="page-heading"><div><p class="eyebrow">Lucrări montate</p><h1>Clienți mulțumiți</h1><p>Adaugă fotografia montajului, clientul, localitatea și părerea lui.</p></div><button class="button primary" type="button" data-add-testimonial>＋ Adaugă client</button></div>
+        <div class="news-list" data-testimonial-list></div>
       </section>
 
       <section class="panel" data-panel="page">
@@ -103,6 +109,24 @@
         <label class="switch full"><input name="published" type="checkbox" checked><span>Noutate vizibilă pe site</span></label>
       </div>
       <div class="dialog-actions"><button class="button ghost" type="button" data-close-news>Anulează</button><button class="button primary" value="default">Salvează noutatea</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="editor-dialog" data-testimonial-dialog>
+    <form method="dialog" data-testimonial-form>
+      <div class="dialog-head"><div><p class="eyebrow">Montaj la client</p><h2 data-testimonial-dialog-title>Adaugă client mulțumit</h2></div><button class="icon-button" type="button" data-close-testimonial aria-label="Închide">×</button></div>
+      <input name="editingIndex" type="hidden">
+      <div class="form-grid">
+        <label>Numele afișat al clientului<input name="clientName" required placeholder="Exemplu: Familia Popescu"></label>
+        <label>Localitatea / adresa afișată<input name="location" required placeholder="Exemplu: Jimbolia, Timiș"></label>
+        <label class="full">Mobilierul montat<input name="furniture" required placeholder="Exemplu: Dormitor complet cu dulap"></label>
+        <label class="full">Părerea clientului<textarea name="review" required placeholder="Suntem foarte mulțumiți de mobilier și de montaj."></textarea></label>
+        <label>Data montajului<input name="date" type="date" required></label>
+        <label>Fotografia montajului<input name="imageFile" type="file" accept="image/*"><small data-current-testimonial-image></small></label>
+        <label class="switch full consent-switch"><input name="consentConfirmed" type="checkbox" required><span>Confirm că am acordul clientului pentru publicarea fotografiei, numelui și localității.</span></label>
+        <label class="switch full"><input name="published" type="checkbox" checked><span>Lucrare vizibilă pe site</span></label>
+      </div>
+      <div class="dialog-actions"><button class="button ghost" type="button" data-close-testimonial>Anulează</button><button class="button primary" value="default">Salvează clientul</button></div>
     </form>
   </dialog>
 
