@@ -1,0 +1,44 @@
+{
+  "hero": {
+    "badge": "Montaj gratuit inclus",
+    "title": "Mobilă pentru casa ta, simplu de ales.",
+    "text": "Intră în categoria dorită, vezi fiecare produs cu descriere și dimensiuni, apoi cere rapid detalii pe WhatsApp.",
+    "image": "/assets/images/dormitor-tapitat-bej-si-negru.jpg"
+  },
+  "catalog": {
+    "eyebrow": "Catalog organizat",
+    "title": "Alege categoria de mobilă",
+    "text": "Fiecare categorie are pagina ei, fără să aglomerăm pagina principală."
+  },
+  "installation": {
+    "eyebrow": "Avantaj important",
+    "title": "Oferim montaj gratuit",
+    "text": "Mobilierul este montat de echipa noastră, fără cost suplimentar pentru montaj. Detaliile de livrare se confirmă în funcție de localitate și comandă."
+  },
+  "wish": {
+    "eyebrow": "Mobilă la dorința ta",
+    "title": "Nu ai găsit modelul potrivit?",
+    "text": "Trimite-ne o fotografie, dimensiunile aproximative și spune-ne ce îți dorești. Revenim cu detalii."
+  },
+  "contact": {
+    "title": "Suntem aici să te ajutăm",
+    "address": "Sat Bulgăruș, Comuna Lenauheim, Nr. 444, județul Timiș.",
+    "primaryName": "Lenuța",
+    "primaryPhoneDisplay": "0765 065 953",
+    "primaryPhoneLink": "40765065953",
+    "secondaryName": "Cristian",
+    "secondaryPhoneDisplay": "0768 355 975",
+    "secondaryPhoneLink": "40768355975"
+  },
+  "announcements": [
+    {
+      "title": "Am primit mobilă nouă",
+      "message": "Au sosit modele noi în magazin. Vizitează catalogul sau scrie-ne pe WhatsApp pentru fotografii și disponibilitate.",
+      "date": "2026-08-30",
+      "image": "/assets/images/model-mobilier-nou-18.jpg",
+      "buttonText": "Vezi modelele",
+      "buttonLink": "/categorii/dormitoare.html",
+      "published": true
+    }
+  ]
+}

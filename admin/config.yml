@@ -11,6 +11,68 @@ public_folder: /assets/uploads
 publish_mode: simple
 
 collections:
+  - name: site
+    label: Pagina principală și noutăți
+    files:
+      - name: settings
+        label: Conținutul site-ului
+        file: data/site.json
+        format: json
+        fields:
+          - label: Imagine și mesaj principal
+            name: hero
+            widget: object
+            fields:
+              - {label: Mesaj scurt, name: badge, widget: string}
+              - {label: Titlu principal, name: title, widget: string}
+              - {label: Text principal, name: text, widget: text}
+              - {label: Imagine principală, name: image, widget: image}
+          - label: Introducere catalog
+            name: catalog
+            widget: object
+            fields:
+              - {label: Etichetă, name: eyebrow, widget: string}
+              - {label: Titlu, name: title, widget: string}
+              - {label: Text, name: text, widget: text}
+          - label: Secțiunea montaj gratuit
+            name: installation
+            widget: object
+            fields:
+              - {label: Etichetă, name: eyebrow, widget: string}
+              - {label: Titlu, name: title, widget: string}
+              - {label: Text, name: text, widget: text}
+          - label: Secțiunea mobilă la dorință
+            name: wish
+            widget: object
+            fields:
+              - {label: Etichetă, name: eyebrow, widget: string}
+              - {label: Titlu, name: title, widget: string}
+              - {label: Text, name: text, widget: text}
+          - label: Date de contact
+            name: contact
+            widget: object
+            fields:
+              - {label: Titlu, name: title, widget: string}
+              - {label: Adresă, name: address, widget: string}
+              - {label: Nume contact principal, name: primaryName, widget: string}
+              - {label: Telefon afișat principal, name: primaryPhoneDisplay, widget: string, hint: "Exemplu: 0765 065 953"}
+              - {label: Telefon link principal, name: primaryPhoneLink, widget: string, hint: "Numai cifre, cu prefix de țară. Exemplu: 40765065953"}
+              - {label: Nume contact secundar, name: secondaryName, widget: string}
+              - {label: Telefon afișat secundar, name: secondaryPhoneDisplay, widget: string}
+              - {label: Telefon link secundar, name: secondaryPhoneLink, widget: string, hint: "Numai cifre, cu prefix de țară."}
+          - label: Noutăți afișate pe site
+            name: announcements
+            widget: list
+            add_to_top: true
+            summary: "{{fields.title}} — {{fields.date}}"
+            fields:
+              - {label: Titlul noutății, name: title, widget: string, hint: "Exemplu: Am primit mobilă nouă"}
+              - {label: Mesaj, name: message, widget: text}
+              - {label: Data, name: date, widget: datetime, format: "YYYY-MM-DD", date_format: "DD.MM.YYYY", time_format: false}
+              - {label: Fotografie, name: image, widget: image, required: false}
+              - {label: Textul butonului, name: buttonText, widget: string, required: false, hint: "Exemplu: Vezi modelele"}
+              - {label: Pagina deschisă de buton, name: buttonLink, widget: string, required: false, hint: "Exemplu: /categorii/dormitoare.html"}
+              - {label: Vizibilă pe site, name: published, widget: boolean, default: true}
   - name: catalog
     label: Catalog mobilier
     files:

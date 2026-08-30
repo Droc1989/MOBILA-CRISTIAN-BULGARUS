@@ -11,6 +11,45 @@ toggle?.addEventListener('click',()=>{const open=document.body.classList.toggle(
 document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('click',()=>{document.body.classList.remove('menu-open');toggle?.setAttribute('aria-expanded','false')}));
 
 async function getCatalog(){const response=await fetch(`${ROOT}data/catalog.json`,{cache:'no-cache'});if(!response.ok)throw new Error('Catalogul nu a putut fi încărcat.');return response.json()}
+async function getSiteSettings(){const response=await fetch(`${ROOT}data/site.json`,{cache:'no-cache'});if(!response.ok)throw new Error('Conținutul site-ului nu a putut fi încărcat.');return response.json()}
+function setText(selector,value){const element=document.querySelector(selector);if(element&&value)element.textContent=value}
+function localPath(path){if(!path)return'';if(/^https?:\/\//i.test(path))return path;return `${ROOT}${path.replace(/^\//,'')}`}
+function formattedDate(value){if(!value)return'';const date=new Date(`${value}T12:00:00`);return Number.isNaN(date.getTime())?'':new Intl.DateTimeFormat('ro-RO',{day:'numeric',month:'long',year:'numeric'}).format(date)}
+
+async function renderSiteSettings(){
+  try{
+    const data=await getSiteSettings();
+    const hero=data.hero||{},catalog=data.catalog||{},installation=data.installation||{},wish=data.wish||{},contact=data.contact||{};
+    setText('[data-hero-badge]',hero.badge);setText('[data-hero-title]',hero.title);setText('[data-hero-text]',hero.text);
+    const heroImage=document.querySelector('[data-hero-image]');if(heroImage&&hero.image)heroImage.src=localPath(hero.image);
+    setText('[data-catalog-eyebrow]',catalog.eyebrow);setText('[data-catalog-title]',catalog.title);setText('[data-catalog-text]',catalog.text);
+    setText('[data-install-eyebrow]',installation.eyebrow);setText('[data-install-title]',installation.title);setText('[data-install-text]',installation.text);
+    setText('[data-wish-eyebrow]',wish.eyebrow);setText('[data-wish-title]',wish.title);setText('[data-wish-text]',wish.text);
+    setText('[data-contact-title]',contact.title);setText('[data-contact-address]',contact.address);
+
+    const primaryLink=String(contact.primaryPhoneLink||'').replace(/\D/g,''),secondaryLink=String(contact.secondaryPhoneLink||'').replace(/\D/g,'');
+    const primaryLabel=[contact.primaryName,contact.primaryPhoneDisplay].filter(Boolean).join(': '),secondaryLabel=[contact.secondaryName,contact.secondaryPhoneDisplay].filter(Boolean).join(': ');
+    const primary=document.querySelector('[data-contact-primary]');if(primary&&primaryLink){primary.href=`tel:+${primaryLink}`;if(primaryLabel)primary.textContent=primaryLabel}
+    const secondary=document.querySelector('[data-contact-secondary]');if(secondary&&secondaryLink){secondary.href=`tel:+${secondaryLink}`;if(secondaryLabel)secondary.textContent=secondaryLabel}
+    if(primaryLink){document.querySelectorAll('a[href^="tel:+40765065953"]').forEach(link=>link.href=`tel:+${primaryLink}`);document.querySelectorAll('a[href^="https://wa.me/40765065953"]').forEach(link=>link.href=link.href.replace('40765065953',primaryLink))}
+
+    const newsSection=document.querySelector('[data-news-section]'),newsGrid=document.querySelector('[data-news-grid]');
+    if(newsSection&&newsGrid){
+      const announcements=(data.announcements||[]).filter(item=>item.published!==false).sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,6);
+      newsGrid.replaceChildren(...announcements.map(item=>{
+        const article=document.createElement('article');article.className='news-card';
+        if(item.image){const image=document.createElement('img');image.src=localPath(item.image);image.alt=item.title||'Noutate Mobilă Cristian Bulgăruș';image.loading='lazy';article.append(image)}
+        const body=document.createElement('div');body.className='news-card-body';
+        const date=formattedDate(item.date);if(date){const time=document.createElement('time');time.className='news-date';time.dateTime=item.date;time.textContent=date;body.append(time)}
+        const title=document.createElement('h3');title.textContent=item.title||'Noutate';body.append(title);
+        if(item.message){const message=document.createElement('p');message.textContent=item.message;body.append(message)}
+        if(item.buttonText&&item.buttonLink){const link=document.createElement('a');link.className='btn btn-dark';link.href=localPath(item.buttonLink);link.textContent=item.buttonText;body.append(link)}
+        article.append(body);return article;
+      }));
+      newsSection.hidden=announcements.length===0;
+    }
+  }catch(error){console.warn(error.message)}
+}
 function productUrl(id){return `${ROOT}produs.html?id=${encodeURIComponent(id)}`}
 function productCard(product){return `<article class="product-card"><a href="${productUrl(product.id)}"><img src="${ROOT}${product.image.replace(/^\//,'')}" alt="${product.name}" loading="lazy"><div class="product-card-body"><h2>${product.name}</h2><p>${product.shortDescription}</p><div class="product-meta"><span>${product.dimensions}</span><span>Vezi detalii →</span></div></div></a></article>`}
 
@@ -22,4 +61,4 @@ async function renderProduct(){const host=document.querySelector('[data-product-
 
 document.querySelectorAll('form[data-netlify-form]').forEach(form=>form.addEventListener('submit',async event=>{event.preventDefault();const status=form.querySelector('.form-status');status.textContent='Se trimite…';try{const response=await fetch('/',{method:'POST',body:new FormData(form)});if(!response.ok)throw new Error();form.reset();status.textContent='Mulțumim! Cererea a fost trimisă.'}catch{status.textContent='Nu am putut trimite formularul. Vă rugăm să ne contactați pe WhatsApp.'}}));
 
-renderCategories();renderCategory();renderProduct();
+renderSiteSettings();renderCategories();renderCategory();renderProduct();
