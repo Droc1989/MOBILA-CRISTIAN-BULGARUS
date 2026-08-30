@@ -2,15 +2,19 @@ const API='/.netlify/git/github';
 const BRANCH='main';
 const $=selector=>document.querySelector(selector);
 const $$=selector=>[...document.querySelectorAll(selector)];
-const state={user:null,catalog:null,site:null,shas:{},dirty:new Set(),changes:0,uploads:new Map(),started:false};
+const state={user:null,catalog:null,publishedCatalog:null,site:null,shas:{},dirty:new Set(),changes:0,uploads:new Map(),started:false};
 
 function toast(message,error=false){const box=$('[data-toast]');box.textContent=message;box.classList.toggle('error',error);box.hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>box.hidden=true,4500)}
 function encodeText(value){const bytes=new TextEncoder().encode(value);let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(binary)}
 function decodeText(value){const clean=value.replace(/\s/g,'');const bytes=Uint8Array.from(atob(clean),char=>char.charCodeAt(0));return new TextDecoder().decode(bytes)}
 async function token(){return state.user.jwt()}
-async function api(path,options={}){const response=await fetch(`${API}${path}`,{...options,headers:{Authorization:`Bearer ${await token()}`,'Content-Type':'application/json',...(options.headers||{})}});if(!response.ok){let detail='';try{detail=(await response.json()).message||''}catch{}throw new Error(detail||`Eroare ${response.status}`)}return response.json()}
+async function api(path,options={}){const response=await fetch(`${API}${path}`,{...options,headers:{Authorization:`Bearer ${await token()}`,'Content-Type':'application/json',...(options.headers||{})}});if(!response.ok){let detail='';try{detail=(await response.json()).message||''}catch{}const error=new Error(detail||`Eroare ${response.status}`);error.status=response.status;throw error}return response.json()}
 async function loadFile(path){const result=await api(`/contents/${path}?ref=${BRANCH}`);return{data:JSON.parse(decodeText(result.content)),sha:result.sha}}
 async function saveFile(path,data,sha,message){return api(`/contents/${path}`,{method:'PUT',body:JSON.stringify({message,content:encodeText(JSON.stringify(data,null,2)+'\n'),branch:BRANCH,sha})})}
+async function loadTextFile(path){try{const result=await api(`/contents/${path}?ref=${BRANCH}`);return{text:decodeText(result.content),sha:result.sha}}catch(error){if(error.status===404)return null;throw error}}
+async function saveTextFile(path,text,message){const current=await loadTextFile(path);if(current?.text===text)return current;const body={message,content:encodeText(text),branch:BRANCH};if(current?.sha)body.sha=current.sha;return api(`/contents/${path}`,{method:'PUT',body:JSON.stringify(body)})}
+async function deleteTextFile(path,message){const current=await loadTextFile(path);if(!current)return;return api(`/contents/${path}`,{method:'DELETE',body:JSON.stringify({message,sha:current.sha,branch:BRANCH})})}
+function cloneData(value){return typeof structuredClone==='function'?structuredClone(value):JSON.parse(JSON.stringify(value))}
 
 function markDirty(type){state.dirty.add(type);state.changes++;const bar=$('[data-publish-bar]');bar.hidden=false;$('[data-change-count]').textContent=state.changes===1?'Ai o modificare nepublicată':`Ai ${state.changes} modificări nepublicate`}
 function categoryName(slug){return state.catalog.categories.find(category=>category.slug===slug)?.name||slug}
@@ -46,15 +50,58 @@ function fillSettings(){const form=$('[data-settings-form]');$$('[data-settings-
 function saveSettings(event){event.preventDefault();const form=event.currentTarget;if(!form.reportValidity())return;for(const field of form.elements){if(!field.name||field.type==='file'||field.type==='submit')continue;const [group,key]=field.name.split('.');if(state.site[group]&&key)state.site[group][key]=field.value.trim()}const file=form.elements['hero.imageFile'].files[0];if(file)state.site.hero.image=registerFile(file);const phoneLink=value=>{const digits=value.replace(/\D/g,'');return digits.startsWith('0')?`40${digits.slice(1)}`:digits};state.site.contact.primaryPhoneLink=phoneLink(state.site.contact.primaryPhoneDisplay);state.site.contact.secondaryPhoneLink=phoneLink(state.site.contact.secondaryPhoneDisplay);markDirty('site');fillSettings();toast('Pagina principală este salvată în așteptare.')}
 
 function fileBase64(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result).split(',')[1]);reader.onerror=reject;reader.readAsDataURL(file)})}
+const MAX_IMAGE_WIDTH=1600;
+const TARGET_UPLOAD_BYTES=900*1024;
+function canvasJpeg(canvas,quality){return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('Imaginea nu a putut fi comprimată.')),'image/jpeg',quality))}
+function loadImageElement(file){return new Promise((resolve,reject)=>{const url=URL.createObjectURL(file),image=new Image();image.onload=()=>resolve({image,release:()=>URL.revokeObjectURL(url)});image.onerror=()=>{URL.revokeObjectURL(url);reject(new Error(`Imaginea ${file.name} nu a putut fi citită.`))};image.src=url})}
+async function compressImage(file){
+  let source,release=()=>{};
+  try{
+    if('createImageBitmap' in window){
+      try{source=await createImageBitmap(file,{imageOrientation:'from-image'});release=()=>source.close?.()}catch{}
+    }
+    if(!source){const loaded=await loadImageElement(file);source=loaded.image;release=loaded.release}
+    const sourceWidth=source.naturalWidth||source.width,sourceHeight=source.naturalHeight||source.height;
+    if(!sourceWidth||!sourceHeight)throw new Error(`Imaginea ${file.name} nu are dimensiuni valide.`);
+    let width=Math.min(sourceWidth,MAX_IMAGE_WIDTH),height=Math.round(sourceHeight*(width/sourceWidth)),quality=.8,blob;
+    const canvas=document.createElement('canvas'),context=canvas.getContext('2d',{alpha:false});
+    if(!context)throw new Error('Browserul nu poate comprima această imagine.');
+    for(let attempt=0;attempt<8;attempt++){
+      canvas.width=Math.max(1,Math.round(width));canvas.height=Math.max(1,Math.round(height));
+      context.fillStyle='#fff';context.fillRect(0,0,canvas.width,canvas.height);context.drawImage(source,0,0,canvas.width,canvas.height);
+      blob=await canvasJpeg(canvas,quality);
+      if(blob.size<=TARGET_UPLOAD_BYTES)break;
+      if(quality>.6)quality=Math.max(.6,quality-.08);
+      else{width=Math.round(width*.88);height=Math.round(height*.88)}
+    }
+    if(!blob)throw new Error(`Imaginea ${file.name} nu a putut fi comprimată.`);
+    const raw=file.name.replace(/\.[^.]+$/,'');
+    return new File([blob],`${raw||'fotografie'}.jpg`,{type:'image/jpeg',lastModified:file.lastModified||Date.now()});
+  }finally{release()}
+}
 function uploadName(file){const dot=file.name.lastIndexOf('.'),raw=dot>0?file.name.slice(0,dot):file.name,ext=dot>0?file.name.slice(dot).toLowerCase():'.jpg';const clean=safeId(raw).slice(0,55);return `${Date.now()}-${Math.random().toString(36).slice(2,7)}-${clean}${ext}`}
-async function uploadPending(){for(const [key,item] of state.uploads){if(item.uploadedPath)continue;const path=`assets/uploads/${uploadName(item.file)}`;await api(`/contents/${path}`,{method:'PUT',body:JSON.stringify({message:`Adaugă fotografia ${item.file.name}`,content:await fileBase64(item.file),branch:BRANCH})});item.uploadedPath=`/${path}`}}
+async function uploadPending(){for(const [key,item] of state.uploads){if(item.uploadedPath)continue;const originalName=item.file.name,compressed=await compressImage(item.file),path=`assets/uploads/${uploadName(compressed)}`;await api(`/contents/${path}`,{method:'PUT',body:JSON.stringify({message:`Adaugă fotografia ${originalName}`,content:await fileBase64(compressed),branch:BRANCH})});item.file=compressed;item.uploadedPath=`/${path}`}}
 function replacePending(path){if(!isPending(path))return path;return state.uploads.get(path.slice(10))?.uploadedPath||path}
 function applyUploadedPaths(){state.catalog.products.forEach(product=>{product.image=replacePending(product.image);product.gallery=(product.gallery||[]).map(replacePending)});state.site.hero.image=replacePending(state.site.hero.image);state.site.announcements.forEach(item=>item.image=replacePending(item.image))}
-async function publish(){const button=$('[data-publish]');button.disabled=true;button.textContent='Se publică…';try{await uploadPending();applyUploadedPaths();if(state.dirty.has('catalog')){const result=await saveFile('data/catalog.json',state.catalog,state.shas.catalog,'Actualizează mobilierul din panoul simplu');state.shas.catalog=result.content?.sha||result.sha||state.shas.catalog}if(state.dirty.has('site')){const result=await saveFile('data/site.json',state.site,state.shas.site,'Actualizează pagina și noutățile');state.shas.site=result.content?.sha||result.sha||state.shas.site}state.dirty.clear();state.changes=0;state.uploads.clear();$('[data-publish-bar]').hidden=true;renderProducts();renderNews();fillSettings();toast('Publicat! Site-ul se actualizează automat în câteva momente.')}catch(error){console.error(error);toast(`Nu am putut publica: ${error.message}`,true)}finally{button.disabled=false;button.textContent='Publică modificările pe site'}}
+async function syncProductPages(){
+  const previousProducts=new Map((state.publishedCatalog?.products||[]).map(product=>[product.id,product]));
+  const currentProducts=new Map(state.catalog.products.map(product=>[product.id,product]));
+  const previousCategories=new Map((state.publishedCatalog?.categories||[]).map(category=>[category.slug,category]));
+  for(const product of state.catalog.products){
+    const category=state.catalog.categories.find(item=>item.slug===product.category),previous=previousProducts.get(product.id),previousCategory=previousCategories.get(product.category);
+    if(previous&&JSON.stringify(previous)===JSON.stringify(product)&&JSON.stringify(previousCategory)===JSON.stringify(category))continue;
+    const path=ProductPageGenerator.productPath(product),html=ProductPageGenerator.generateProductHtml(product,category);
+    await saveTextFile(path,html,`Actualizează pagina produsului ${product.name}`);
+  }
+  for(const product of previousProducts.values()){
+    if(!currentProducts.has(product.id))await deleteTextFile(ProductPageGenerator.productPath(product),`Șterge pagina produsului ${product.name}`);
+  }
+}
+async function publish(){const button=$('[data-publish]');button.disabled=true;button.textContent='Se publică…';try{await uploadPending();applyUploadedPaths();if(state.dirty.has('catalog')){await syncProductPages();const result=await saveFile('data/catalog.json',state.catalog,state.shas.catalog,'Actualizează mobilierul din panoul simplu');state.shas.catalog=result.content?.sha||result.sha||state.shas.catalog;state.publishedCatalog=cloneData(state.catalog)}if(state.dirty.has('site')){const result=await saveFile('data/site.json',state.site,state.shas.site,'Actualizează pagina și noutățile');state.shas.site=result.content?.sha||result.sha||state.shas.site}state.dirty.clear();state.changes=0;state.uploads.clear();$('[data-publish-bar]').hidden=true;renderProducts();renderNews();fillSettings();toast('Publicat! Site-ul se actualizează automat în câteva momente.')}catch(error){console.error(error);toast(`Nu am putut publica: ${error.message}`,true)}finally{button.disabled=false;button.textContent='Publică modificările pe site'}}
 
 function bindEvents(){$$('[data-tab]').forEach(button=>button.addEventListener('click',()=>{$$('[data-tab]').forEach(item=>item.classList.toggle('active',item===button));$$('[data-panel]').forEach(panel=>panel.classList.toggle('active',panel.dataset.panel===button.dataset.tab))}));$('[data-product-search]').addEventListener('input',renderProducts);$('[data-category-filter]').addEventListener('change',renderProducts);$('[data-add-product]').addEventListener('click',()=>openProduct());$('[data-product-form]').addEventListener('submit',saveProduct);$$('[data-close-product]').forEach(button=>button.addEventListener('click',()=>$('[data-product-dialog]').close()));$('[data-edit-gallery]').addEventListener('click',event=>{const remove=event.target.closest('[data-remove-gallery]');if(!remove)return;const host=$('[data-edit-gallery]'),gallery=JSON.parse(host.dataset.gallery||'[]');gallery.splice(Number(remove.dataset.removeGallery),1);host.dataset.gallery=JSON.stringify(gallery);renderEditGallery()});$('[data-product-list]').addEventListener('click',event=>{const edit=event.target.closest('[data-edit-product]'),remove=event.target.closest('[data-delete-product]');if(edit)openProduct(Number(edit.dataset.editProduct));if(remove)deleteProduct(Number(remove.dataset.deleteProduct))});$('[data-add-news]').addEventListener('click',()=>openNews());$('[data-news-form]').addEventListener('submit',saveNews);$$('[data-close-news]').forEach(button=>button.addEventListener('click',()=>$('[data-news-dialog]').close()));$('[data-news-list]').addEventListener('click',event=>{const edit=event.target.closest('[data-edit-news]'),remove=event.target.closest('[data-delete-news]');if(edit)openNews(Number(edit.dataset.editNews));if(remove)deleteNews(Number(remove.dataset.deleteNews))});$('[data-settings-form]').addEventListener('submit',saveSettings);$('[data-publish]').addEventListener('click',publish);$('[data-logout]').addEventListener('click',()=>netlifyIdentity.logout())}
 
-async function start(user){if(state.started)return;state.started=true;state.user=user;$('[data-login-screen]').hidden=true;$('[data-app]').hidden=false;$('[data-user-email]').textContent=user.email||'';try{const [catalog,site]=await Promise.all([loadFile('data/catalog.json'),loadFile('data/site.json')]);state.catalog=catalog.data;state.site=site.data;state.site.announcements||=[];state.shas={catalog:catalog.sha,site:site.sha};populateCategories();renderProducts();renderNews();fillSettings();bindEvents()}catch(error){console.error(error);toast(`Nu am putut încărca datele: ${error.message}`,true)}}
+async function start(user){if(state.started)return;state.started=true;state.user=user;$('[data-login-screen]').hidden=true;$('[data-app]').hidden=false;$('[data-user-email]').textContent=user.email||'';try{const [catalog,site]=await Promise.all([loadFile('data/catalog.json'),loadFile('data/site.json')]);state.catalog=catalog.data;state.publishedCatalog=cloneData(catalog.data);state.site=site.data;state.site.announcements||=[];state.shas={catalog:catalog.sha,site:site.sha};populateCategories();renderProducts();renderNews();fillSettings();bindEvents()}catch(error){console.error(error);toast(`Nu am putut încărca datele: ${error.message}`,true)}}
 function showLogin(){state.started=false;state.user=null;$('[data-app]').hidden=true;$('[data-login-screen]').hidden=false}
 
 $('[data-login]').addEventListener('click',()=>netlifyIdentity.open('login'));

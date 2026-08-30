@@ -6,8 +6,11 @@ Site static responsive pentru prezentarea și solicitarea rapidă a mobilierului
 
 - pagină separată pentru fiecare ramură: dormitoare și paturi, dulapuri, comode, mese și scaune, living, canapele și alte produse;
 - pagină de detalii pentru fiecare produs, cu fotografii, descriere, dimensiuni și materiale;
+- pagină „Probează mobila” cu fotografie de cameră și poziționare, redimensionare și rotire direct pe canvas;
 - cerere de detalii pentru fiecare model, trimisă rapid prin WhatsApp;
-- panou de administrare la `/admin/`, bazat pe Decap CMS, Netlify Identity și Git Gateway;
+- panou de administrare propriu la `/admin/`, autentificat prin Netlify Identity și conectat la repository prin Git Gateway;
+- compresie automată în browser pentru fotografiile încărcate din panoul de administrare;
+- pagini HTML statice pentru produse, cu Open Graph și JSON-LD specifice fiecărui model;
 - formular „Ai o dorință de mobilă?”, inclusiv încărcarea unei fotografii de pe telefon;
 - bară de contact fixă pe telefon: apel, WhatsApp și cerere de ofertă;
 - mesajul „Montaj gratuit” evidențiat în zonele principale;
@@ -18,9 +21,16 @@ Site static responsive pentru prezentarea și solicitarea rapidă a mobilierului
 ```text
 index.html                         pagina principală simplificată
 categorii/                         paginile celor șapte categorii
-produs.html                        pagina dinamică de detalii a produsului
+produs.html                        compatibilitate pentru linkurile vechi de produs
+produse/                           paginile statice generate pentru fiecare produs
+probeaza-mobila.html               instrumentul de probare a mobilierului în cameră
 data/catalog.json                  catalogul central editabil
-admin/                             loginul și panoul administratorului
+data/site.json                     conținutul paginii principale și noutățile
+admin/index.html + admin/app.js    interfața proprie de administrare
+scripts/                           generatoarele paginilor și datelor structurate
+assets/product-pages.js            generator comun browser/Node pentru produse
+assets/room-planner.js              interacțiunile canvas pentru probarea mobilierului
+assets/furniture/                   piesele PNG cu fundal transparent
 assets/site.css / assets/site.js   designul și funcționalitatea comună
 assets/brand/                      logo-ul oficial
 assets/facebook/                   fotografii recente preluate din pagina afacerii
@@ -42,9 +52,25 @@ Administratorul deschide `https://www.mobilacristian.onl/admin/`, se autentific�
 - adăuga, ascunde sau modifica produse;
 - încărca fotografia principală și imagini suplimentare;
 - modifica descrierile, dimensiunile și materialele;
-- schimba imaginile și descrierile categoriilor.
+- schimba imaginea și textele principale ale site-ului;
+- publica, modifica sau ascunde noutăți.
 
-Accesul se păstrează pe bază de invitație. Modificările sunt salvate în `data/catalog.json` și în `assets/uploads/`.
+Panoul nu folosește Decap CMS. Este o interfață JavaScript proprie: Netlify Identity autentifică administratorul, iar Git Gateway permite citirea și scrierea fișierelor din repository. Accesul se păstrează pe bază de invitație.
+
+Înainte de încărcare, toate imaginile sunt convertite în JPEG, redimensionate la maximum 1600 px lățime și comprimate în browser. Produsele sunt salvate în `data/catalog.json`, conținutul general și noutățile în `data/site.json`, iar fotografiile în `assets/uploads/`.
+
+La „Publică modificările”, panoul generează sau actualizează și pagina `produse/[id-produs].html`. Astfel, titlul, descrierea și imaginea Open Graph sunt prezente direct în HTML pentru WhatsApp și Facebook. Paginile generate includ și date structurate `Product` și `BreadcrumbList`.
+
+## Generare și verificare locală
+
+Site-ul este static și nu are dependențe npm sau un pas de compilare. Comanda `npm run build` verifică local fișierele esențiale și instrumentul „Probează mobila”. După modificarea manuală a catalogului, paginile și datele structurate se regenerează cu:
+
+```bash
+node scripts/generate-static-structured-data.cjs
+node scripts/generate-product-pages.cjs
+```
+
+În utilizarea normală, paginile produselor sunt generate automat de panoul de administrare la publicare.
 
 ## Contact folosit pe site
 
