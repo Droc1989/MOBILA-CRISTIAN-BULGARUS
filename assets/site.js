@@ -7,8 +7,10 @@ function footerHtml(){return `<footer class="site-footer"><div class="container"
 document.querySelector('[data-site-header]')?.insertAdjacentHTML('afterbegin',headerHtml());
 document.querySelector('[data-site-footer]')?.insertAdjacentHTML('afterbegin',footerHtml());
 const toggle=document.querySelector('.menu-toggle');
-toggle?.addEventListener('click',()=>{const open=document.body.classList.toggle('menu-open');toggle.setAttribute('aria-expanded',String(open));toggle.textContent=open?'×':'☰'});
-document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('click',()=>{document.body.classList.remove('menu-open');toggle?.setAttribute('aria-expanded','false')}));
+function setMenuState(open){document.body.classList.toggle('menu-open',open);if(!toggle)return;toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Închide meniul':'Deschide meniul');toggle.textContent=open?'×':'☰'}
+toggle?.addEventListener('click',()=>setMenuState(!document.body.classList.contains('menu-open')));
+document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('click',()=>setMenuState(false)));
+addEventListener('resize',()=>{if(innerWidth>900)setMenuState(false)});
 
 async function getCatalog(){const response=await fetch(`${ROOT}data/catalog.json`,{cache:'no-cache'});if(!response.ok)throw new Error('Catalogul nu a putut fi încărcat.');return response.json()}
 async function getSiteSettings(){const response=await fetch(`${ROOT}data/site.json`,{cache:'no-cache'});if(!response.ok)throw new Error('Conținutul site-ului nu a putut fi încărcat.');return response.json()}
