@@ -2,13 +2,114 @@
 <html lang="ro">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="robots" content="noindex,nofollow">
-  <title>Administrator | Mobilă Cristian Bulgăruș</title>
+  <meta name="theme-color" content="#2f211a">
+  <title>Administrare simplă | Mobilă Cristian Bulgăruș</title>
   <link rel="icon" href="../assets/brand/logo-mobila-cristian.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Karla:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="admin.css">
 </head>
 <body>
+  <div class="login-screen" data-login-screen>
+    <div class="login-card">
+      <img src="../assets/brand/logo-mobila-cristian.webp" alt="Mobilă Cristian Bulgăruș">
+      <p class="eyebrow">Panou administrator</p>
+      <h1>Administrează mobila simplu</h1>
+      <p>Intră în cont pentru a adăuga fotografii, modifica produsele și publica schimbările pe site.</p>
+      <button class="button primary wide" type="button" data-login>Intră în cont</button>
+    </div>
+  </div>
+
+  <div class="app" data-app hidden>
+    <header class="app-header">
+      <a href="../" class="admin-brand" target="_blank" rel="noopener"><img src="../assets/brand/logo-mobila-cristian.webp" alt="Mobilă Cristian Bulgăruș"><span>Vezi site-ul ↗</span></a>
+      <div class="account"><span data-user-email></span><button class="text-button" type="button" data-logout>Ieșire</button></div>
+    </header>
+
+    <nav class="tabs" aria-label="Secțiuni administrare">
+      <button class="tab active" data-tab="products" type="button">Mobilă</button>
+      <button class="tab" data-tab="news" type="button">Noutăți</button>
+      <button class="tab" data-tab="page" type="button">Pagina principală</button>
+    </nav>
+
+    <main class="admin-main">
+      <section class="panel active" data-panel="products">
+        <div class="page-heading"><div><p class="eyebrow">Catalog mobilier</p><h1>Toată mobila</h1><p>Alege categoria sau caută produsul după nume.</p></div><button class="button primary" type="button" data-add-product>＋ Adaugă mobilă</button></div>
+        <div class="toolbar">
+          <label class="search"><span>Caută după nume</span><input type="search" placeholder="Exemplu: Dulap Roma" data-product-search></label>
+          <label><span>Categorie</span><select data-category-filter><option value="">Toate categoriile</option></select></label>
+        </div>
+        <div class="result-line"><strong data-product-count>0 produse</strong><span>Apasă „Modifică” pentru a schimba detaliile.</span></div>
+        <div class="product-list" data-product-list></div>
+      </section>
+
+      <section class="panel" data-panel="news">
+        <div class="page-heading"><div><p class="eyebrow">Mesaje publice</p><h1>Noutăți din magazin</h1><p>Publică rapid mesaje precum „Am primit mobilă nouă”.</p></div><button class="button primary" type="button" data-add-news>＋ Adaugă noutate</button></div>
+        <div class="news-list" data-news-list></div>
+      </section>
+
+      <section class="panel" data-panel="page">
+        <div class="page-heading"><div><p class="eyebrow">Conținut general</p><h1>Pagina principală</h1><p>Modifică textele importante și datele de contact.</p></div></div>
+        <form class="settings-form" data-settings-form>
+          <fieldset><legend>Prima imagine și primul mesaj</legend><label>Titlu<input name="hero.title" required></label><label>Text<textarea name="hero.text" required></textarea></label><label>Mesaj scurt<input name="hero.badge" required></label><label>Imagine principală<input name="hero.imageFile" type="file" accept="image/*"><small data-hero-image-name></small></label></fieldset>
+          <fieldset><legend>Montaj gratuit</legend><label>Titlu<input name="installation.title" required></label><label>Text<textarea name="installation.text" required></textarea></label></fieldset>
+          <fieldset><legend>Mobilă la dorință</legend><label>Titlu<input name="wish.title" required></label><label>Text<textarea name="wish.text" required></textarea></label></fieldset>
+          <fieldset><legend>Contact</legend><label>Adresă<input name="contact.address" required></label><div class="two-cols"><label>Nume principal<input name="contact.primaryName" required></label><label>Telefon principal<input name="contact.primaryPhoneDisplay" required></label><label>Nume secundar<input name="contact.secondaryName" required></label><label>Telefon secundar<input name="contact.secondaryPhoneDisplay" required></label></div></fieldset>
+          <button class="button secondary" type="submit">Salvează modificările în așteptare</button>
+        </form>
+      </section>
+    </main>
+
+    <div class="publish-bar" data-publish-bar hidden>
+      <div><strong data-change-count>Ai modificări nepublicate</strong><span>Site-ul nu se schimbă până nu apeși butonul.</span></div>
+      <button class="button publish" type="button" data-publish>Publică modificările pe site</button>
+    </div>
+  </div>
+
+  <dialog class="editor-dialog" data-product-dialog>
+    <form method="dialog" data-product-form>
+      <div class="dialog-head"><div><p class="eyebrow">Mobilă</p><h2 data-product-dialog-title>Adaugă produs</h2></div><button class="icon-button" type="button" data-close-product aria-label="Închide">×</button></div>
+      <input name="editingIndex" type="hidden">
+      <div class="form-grid">
+        <label>Numele mobilei<input name="name" required placeholder="Exemplu: Dulap Roma"></label>
+        <label>Categoria<select name="category" required></select></label>
+        <label class="full">Descriere scurtă<textarea name="shortDescription" required></textarea></label>
+        <label class="full">Descriere completă<textarea name="description" required></textarea></label>
+        <label>Dimensiuni<input name="dimensions" required placeholder="L 200 × A 60 × H 220 cm"></label>
+        <label>Materiale<input name="materials" required></label>
+        <label class="full">Fotografia principală<input name="mainImage" type="file" accept="image/*"><small data-current-main-image></small></label>
+        <label class="full">Alte fotografii<input name="galleryImages" type="file" accept="image/*" multiple><small>Poți selecta mai multe fotografii odată.</small></label>
+        <div class="edit-gallery full" data-edit-gallery></div>
+        <label class="switch full"><input name="available" type="checkbox" checked><span>Produs vizibil pe site</span></label>
+      </div>
+      <div class="dialog-actions"><button class="button ghost" type="button" data-close-product>Anulează</button><button class="button primary" value="default">Salvează produsul</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="editor-dialog" data-news-dialog>
+    <form method="dialog" data-news-form>
+      <div class="dialog-head"><div><p class="eyebrow">Noutate</p><h2 data-news-dialog-title>Adaugă noutate</h2></div><button class="icon-button" type="button" data-close-news aria-label="Închide">×</button></div>
+      <input name="editingIndex" type="hidden">
+      <div class="form-grid">
+        <label class="full">Titlu<input name="title" required placeholder="Am primit mobilă nouă"></label>
+        <label class="full">Mesaj<textarea name="message" required></textarea></label>
+        <label>Data<input name="date" type="date" required></label>
+        <label>Fotografie<input name="imageFile" type="file" accept="image/*"><small data-current-news-image></small></label>
+        <label>Text buton<input name="buttonText" placeholder="Vezi modelele"></label>
+        <label>Pagina butonului<input name="buttonLink" placeholder="/categorii/dulapuri.html"></label>
+        <label class="switch full"><input name="published" type="checkbox" checked><span>Noutate vizibilă pe site</span></label>
+      </div>
+      <div class="dialog-actions"><button class="button ghost" type="button" data-close-news>Anulează</button><button class="button primary" value="default">Salvează noutatea</button></div>
+    </form>
+  </dialog>
+
+  <dialog class="confirm-dialog" data-confirm-dialog><form method="dialog"><h2>Ștergi acest element?</h2><p>Această acțiune va deveni definitivă numai după publicare.</p><div class="dialog-actions"><button class="button ghost" value="cancel">Renunță</button><button class="button danger" value="confirm">Da, șterge</button></div></form></dialog>
+
+  <div class="toast" data-toast role="status" aria-live="polite" hidden></div>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-  <script src="https://unpkg.com/decap-cms@3.8.3/dist/decap-cms.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
