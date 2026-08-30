@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /privacy.html
 
-Sitemap: https://mobilacristianbulgarus.ro/sitemap.xml
+Sitemap: https://www.mobilacristian.onl/sitemap.xml
