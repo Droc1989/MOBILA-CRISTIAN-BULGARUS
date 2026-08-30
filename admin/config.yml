@@ -5,7 +5,7 @@ backend:
 locale: ro
 site_url: https://www.mobilacristian.onl
 display_url: https://www.mobilacristian.onl
-logo_url: https://www.mobilacristian.onl/assets/brand/logo-mobila-cristian.png
+logo_url: https://www.mobilacristian.onl/assets/brand/logo-mobila-cristian.webp
 media_folder: assets/uploads
 public_folder: /assets/uploads
 publish_mode: simple
