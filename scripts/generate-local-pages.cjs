@@ -71,7 +71,7 @@ const pageHtml = ({ name, county, slug, type }) => {
   <script type="application/ld+json">${JSON.stringify(schema)}</script>
 </head>
 <body data-local-page="${slug}"><div data-site-header></div><main>
-  <header class="legal-hero"><div class="container"><div class="breadcrumbs"><a href="index.html">Acasă</a> / ${esc(name)}</div><p class="eyebrow">Mobilă ieftină · ${esc(county)}</p><h1>Mobilă ieftină și de calitate în ${esc(name)}</h1><p class="lead">Mobilier pentru dormitor, dulap, living, bucătărie și sufragerie, cu montaj gratuit realizat de echipa noastră. Livrăm în ${esc(name)} și în comunele din județul ${esc(county)}.</p></div></header>
+  <header class="legal-hero"><div class="container"><div class="breadcrumbs"><a href="index.html">Acasă</a> / ${esc(name)}</div><p class="eyebrow">Mobilă ieftină · ${esc(county)}</p><h1>Mobilă ieftină și de calitate în ${esc(name)}</h1><p class="lead">Mobilier pentru dormitor, dulap, living, bucătărie și sufragerie, cu montaj gratuit realizat de echipa noastră. Livrăm în ${esc(name)} și în zona din jur.</p></div></header>
   <article class="legal-main">
     <h2>Mobilă ieftină și de calitate în ${esc(name)}</h2>
     <p>Mobilă Cristian Bulgăruș oferă mobilier pentru casă și apartament cu livrare în ${esc(name)} și montaj gratuit. Alegi modelul, confirmăm împreună dimensiunile, disponibilitatea și prețul complet înainte de comandă.</p>
@@ -86,7 +86,7 @@ const pageHtml = ({ name, county, slug, type }) => {
       <li><a href="categorii/altele.html">Alte produse</a></li>
     </ul>
     <h2>Livrare și montaj în ${esc(name)}</h2>
-    <p>Livrarea se stabilește în funcție de fiecare comandă. Montajul este gratuit și este realizat direct de echipa noastră. Pentru detalii despre condițiile livrării, vezi <a href="livrare-montaj.html">pagina de livrare și montaj</a>.</p>
+    <p>Livrarea se stabilește în funcție de fiecare comandă și de zona ta. Montajul este gratuit și este realizat direct de echipa noastră. Pentru detalii despre condițiile livrării, vezi <a href="livrare-montaj.html">pagina de livrare și montaj</a>.</p>
     <h2>Încearcă mobila înainte</h2>
     <p>Poți vedea cum arată un model în camera ta cu instrumentul <a href="probeaza-mobila.html">Probează mobila</a>.</p>
     <div class="legal-actions"><a class="btn btn-dark" href="tel:+40765065953">Sună acum</a><a class="btn btn-whatsapp" href="https://wa.me/40765065953" target="_blank" rel="noopener">Scrie pe WhatsApp</a></div>
